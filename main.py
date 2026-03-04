@@ -16,24 +16,26 @@ from utils.argument_parser import parse_command_line_arguments
 
 args = parse_command_line_arguments()
 
-if args.name:
-    # Fetch and display account information and collaborated posts
-    printBanner()
-    fetch_instagram_account_data(args.name)
-elif args.dload:
+# Prioritize download logic when -d/--dload is provided,
+# since -n/--name can be used together with -d for numbered downloads.
+if args.dload:
     # Handle media download based on argument type (URL or post number)
     printBanner()
     # Check if the argument is a number or a URL
     try:
         post_number = int(args.dload)
         # If it's a number, we need to get the username from the -n flag
-        if hasattr(args, 'name') and args.name:
+        if hasattr(args, "name") and args.name:
             download_instagram_media_by_number(args.name, post_number)
         else:
             colorPrint(
                 RED, "[ERROR] \t\t",
-                RED, "Username (-n) is required when using post number with -d flag"
+                RED, "Username (-n) is required when using post number with -d flag",
             )
     except ValueError:
         # If it's not a number, treat it as a URL
         download_instagram_media(args.dload)
+elif args.name:
+    # Fetch and display account information and collaborated posts
+    printBanner()
+    fetch_instagram_account_data(args.name)
